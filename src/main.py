@@ -54,7 +54,7 @@ def worker(rank, options, logger):
     
     options.batch_size = options.batch_size // options.num_devices
 
-    model, processor = load_model(name = options.model_name, pretrained = options.pretrained)
+    model, processor = load_model(name=options.model_name, pretrained=options.pretrained)
 
     if options.device == "cpu":
         model.float()
