@@ -33,8 +33,8 @@ rm -rf /discobox/wjpeng/ckp/betterCLIP/debug
 python -m src.main \
 --log='/discobox/wjpeng/ckp/betterCLIP/debug' \
 --name='exp1' \
---train_data='/discobox/wjpeng/dataset/cc3m/data/val/train.csv' \
---validation_data='/discobox/wjpeng/dataset/cc3m/data/val/train.csv' \
+--train_data='/discobox/wjpeng/dataset/cc3m/data/val/train_filtered.csv' \
+--validation_data='/discobox/wjpeng/dataset/cc3m/data/val/train_filtered.csv' \
 --image_key='image' \
 --caption_key='caption' \
 --device_ids 0\
