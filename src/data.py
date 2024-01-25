@@ -18,8 +18,7 @@ class ImageCaptionDataset(Dataset):
         logging.debug(f"Loading aligned data from {path}")
 
         df = pd.read_csv(path, sep=delimiter)
-        from IPython import embed
-        embed(header='dataset')
+
         self.root = os.path.dirname(path)
         self.images = df[image_key].tolist()
         self.captions = processor.process_text(df[caption_key].tolist())
