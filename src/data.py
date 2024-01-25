@@ -236,9 +236,8 @@ def load(options, processor):
         dataloader = get_extra_data(args=options,
                                     data_type=extra_data_type,
                                     processor=processor)
-        # data[f'train-{extra_data_type}'] = DataInfo(dataloader=dataloader,
-        #                                             iterator=iter(dataloader),
-        #                                             sampler=dataloader.sampler)
+        data[f'train-{extra_data_type}'] = dataloader
+
     # data["validation"] = get_validation_dataloader(options, processor)
     # data["eval_test"] = get_eval_test_dataloader(options, processor)
     # data["eval_train"] = get_eval_train_dataloader(options, processor)

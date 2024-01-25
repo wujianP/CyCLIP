@@ -48,7 +48,9 @@ def parse_args():
 
     # add by wj
     parser.add_argument("--extra-train-data", type=str, help='path to extra train data')
+    parser.add_argument("--extra-ann-root", type=str, help='path to extra ann data')
     parser.add_argument("--extra-batch-size", type=int, default=8)
+    parser.add_argument("--extra-workers", type=int, default=2)
     parser.add_argument("--extra-data-type", type=str, nargs='+', choices=['count', 'relative-size', 'absolute-size', 'relative-spatial', 'absolute-spatial', 'existence'])
     parser.add_argument("--steps-per-epoch", type=int, default=100)
     parser.add_argument("--from-pretrained", type=str, help='the path to pretrained checkpoint')
