@@ -46,7 +46,12 @@ class ImageCaptionDataset(Dataset):
         else:
             item["input_ids"] = self.captions["input_ids"][idx]
             item["attention_mask"] = self.captions["attention_mask"][idx]
-            item["pixel_values"] = self.processor.process_image(Image.open(os.path.join(self.root, self.images[idx])))
+            try:
+                item["pixel_values"] = self.processor.process_image(
+                    Image.open(os.path.join(self.root, self.images[idx])))
+            except:
+                from IPython import embed
+                embed(header='dataload')
 
         return item
 
