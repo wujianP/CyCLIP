@@ -96,10 +96,17 @@ def get_loss(umodel, outputs, criterion, options):
 def train(epoch, model, data, optimizer, scheduler, scaler, options):
     from IPython import embed
     embed(header='train')
-    dataloader = data["train"]
+
+    dataloader = data["train-common"]
 
     if options.distributed:
-        dataloader.sampler.set_epoch(epoch)
+        data['train-common'].set_epoch(epoch)
+        data['train-count'].set_epoch(epoch)
+        data['train-relative-size'].set_epoch(epoch)
+        data['train-absolute-size'].set_epoch(epoch)
+        data['train-relative-spatial'].set_epoch(epoch)
+        data['train-absolute-spatial'].set_epoch(epoch)
+        data['train-existence'].set_epoch(epoch)
 
     model.train()
     criterion = nn.CrossEntropyLoss().to(options.device)

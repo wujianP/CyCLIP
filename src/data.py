@@ -232,9 +232,9 @@ class DataInfo:
 def load(options, processor):
     data = {}
     common_dataloader = get_train_dataloader(options, processor)
-    data["train"] = DataInfo(dataloader=common_dataloader,
-                             iterator=iter(common_dataloader),
-                             sampler=common_dataloader.sampler)
+    data["train-common"] = DataInfo(dataloader=common_dataloader,
+                                    iterator=iter(common_dataloader),
+                                    sampler=common_dataloader.sampler)
     # generate extra data
     from .extra_dataset import get_extra_data
     for extra_data_type in options.extra_data_type:
