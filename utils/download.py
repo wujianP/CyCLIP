@@ -76,6 +76,8 @@ def multiprocess(df, function, dir, hash):
         return df
 
 def run(options):
+    from IPython import embed
+    embed()
     os.makedirs(options.dir, exist_ok = True)
     os.makedirs(os.path.join(options.dir, "images"), exist_ok = True)
     
