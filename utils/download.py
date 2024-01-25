@@ -91,8 +91,8 @@ def run(options):
 if(__name__ == "__main__"):
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--file", dest = "file", type = str, default = None, help = "File")
-    parser.add_argument("--dir", dest = "dir", type = str, default = None, help = "Directory")
+    parser.add_argument("--file", type = str, default = None, help = "File")
+    parser.add_argument("--dir", type = str, default = None, help = "Directory")
     parser.add_argument("-s,--start", dest = "start", type = int, default = 0, help = "Start index")
     parser.add_argument("-e,--end", dest = "end", type = int, default = 1000000000000, help = "End index")
 
