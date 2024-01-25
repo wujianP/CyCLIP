@@ -10,7 +10,7 @@ from PIL import Image
 
 class ExtraDataset(Dataset):
     def __init__(self, data_root, ann_root, hard_num, image_names, text_templates, object_num,
-                 blip_caption=False, llama_caption=False, processor=None):
+                 blip_caption=True, llama_caption=False, processor=None):
         """
         Args:
             data_root: the path to the root dir of dataset
@@ -127,9 +127,7 @@ def get_extra_data(args, data_type, processor):
         image_names=metadata['image_names'],
         text_templates=metadata['text_templates'],
         object_num=metadata['object_num'],
-        processor=processor,
-        blip_caption=args.blip_caption,
-        llama_caption=args.llama_caption,
+        processor=processor
     )
 
     from IPython import embed

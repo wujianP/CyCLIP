@@ -42,7 +42,7 @@ python -m src.main \
 --device_ids 1 \
 --model_name='RN50' \
 --epochs='1' \
---batch_size=128 \
+--batch_size=16 \
 --lr=5e-4 \
 --num_warmup_steps=10000 \
 --device='gpu' \
