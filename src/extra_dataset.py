@@ -122,7 +122,7 @@ def get_extra_data(args, data_type, processor):
 
     dataset = ExtraDataset(
         data_root=data_root,
-        ann_root=os.path.join(args.ann_root, f"{data_type.replace('-', '_')}_captions_all.json"),
+        ann_root=os.path.join(args.extra_ann_root, f"{data_type.replace('-', '_')}_captions_all.json"),
         hard_num=hard_num,
         image_names=metadata['image_names'],
         text_templates=metadata['text_templates'],
