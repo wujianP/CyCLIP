@@ -48,7 +48,7 @@ def parse_args():
 
     parser.add_argument("--extra-train-data", type=str, help='path to extra train data')
     parser.add_argument("--extra-batch-size", type=int, default=8)
-    parser.add_argument("", type=str, nargs='+', choices=['count', 'relative-size', 'absolute-size', 'relative-spatial', 'absolute-spatial', 'existence'])
+    parser.add_argument("--extra-data-type", type=str, nargs='+', choices=['count', 'relative-size', 'absolute-size', 'relative-spatial', 'absolute-spatial', 'existence'])
 
     options = parser.parse_args()
     return options

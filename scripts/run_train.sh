@@ -33,7 +33,7 @@ rm -rf /discobox/wjpeng/ckp/betterCLIP/debug
 python -m src.main \
 --log='/discobox/wjpeng/ckp/betterCLIP/debug' \
 --name='exp1' \
---train_data='/discobox/wjpeng/dataset/cc3m/data/train/train_01.csv' \
+--train_data='/discobox/wjpeng/dataset/cc3m/data/val/train.csv' \
 --validation_data='/discobox/wjpeng/dataset/cc3m/data/val/train.csv' \
 --image_key='image' \
 --caption_key='caption' \
@@ -45,4 +45,7 @@ python -m src.main \
 --num_warmup_steps=10000 \
 --device='gpu' \
 --cylambda1 0.25 \
---cylambda2 0.25
+--cylambda2 0.25 \
+--extra-train-data='/DDN_ROOT/wjpeng/dataset/VL-benchmark/train/' \
+--extra-batch-size=8 \
+--extra-data-type count existence relative-size absolute-size absolute-spatial relative-spatial
