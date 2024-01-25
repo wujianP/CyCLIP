@@ -74,16 +74,6 @@ def get_train_dataloader(options, processor):
     return dataloader
 
 
-def get_extra_train_dataloader(options, processor):
-    path = options.extra_train_data
-    if path is None:
-        return None
-
-    batch_size = options.extra_batch_soze
-
-
-
-
 def get_validation_dataloader(options, processor):
     path = options.validation_data
     if (path is None): return
@@ -237,6 +227,8 @@ def load(options, processor):
                                     data_type=extra_data_type,
                                     processor=processor)
         data[f'train-{extra_data_type}'] = dataloader
+    from IPython import embed
+    embed(header='data')
 
     # data["validation"] = get_validation_dataloader(options, processor)
     # data["eval_test"] = get_eval_test_dataloader(options, processor)

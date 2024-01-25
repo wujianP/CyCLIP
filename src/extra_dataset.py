@@ -77,22 +77,13 @@ class ExtraDataset(Dataset):
                 text = f'{blip_caption}, and {text}'
             text_list.append(text)
 
-        from IPython import embed
-        embed(header='getitem')
-
-        if self.processor is not None:
-            images = torch.stack([self.transform(img) for img in image_list], dim=0)
-        else:
-            images = image_list
-
-        if self.processor is not None:
-            texts = self.tokenizer(text_list)
-        else:
-            texts = text_list
+        images = torch.stack([self.processor.process_image(img) for img in image_list], dim=0)
+        texts = self.processor.process_text(text_list)
 
         sample = {
-            'images': images,
-            'texts': texts
+            'pixel_values': images,
+            'input_ids': texts['input_ids'],
+            'attention_mask': texts['attention_mask']
         }
 
         return sample
@@ -129,9 +120,6 @@ def get_extra_data(args, data_type, processor):
         object_num=metadata['object_num'],
         processor=processor
     )
-
-    from IPython import embed
-    embed(header='dataset')
 
     sampler = DistributedSampler(dataset) if args.distributed else None
     shuffle = sampler is None
