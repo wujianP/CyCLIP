@@ -12,12 +12,15 @@ python -m src.main \
 --model_name='RN50' \
 --epochs='1' \
 --batch_size=128 \
---lr=5e-4 \
+--lr=5e-6 \
 --num_warmup_steps=10000 \
 --device='gpu' \
 --distributed \
 --cylambda1 0.25 \
---cylambda2 0.25
+--cylambda2 0.25 \
+--extra-train-data='' \
+--extra-batch-size=8 \
+--extra-data-type
 
 
 --checkpoint='' \

@@ -46,5 +46,9 @@ def parse_args():
     parser.add_argument("--checkpoint", default = None, type = str, help = "Path to checkpoint to resume training")
     parser.add_argument("--pretrained", default = False, action = "store_true", help = "Use the OpenAI pretrained models")
 
+    parser.add_argument("--extra-train-data", type=str, help='path to extra train data')
+    parser.add_argument("--extra-batch-size", type=int, default=8)
+    parser.add_argument("", type=str, nargs='+', choices=['count', 'relative-size', 'absolute-size', 'relative-spatial', 'absolute-spatial', 'existence'])
+
     options = parser.parse_args()
     return options
