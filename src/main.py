@@ -130,7 +130,7 @@ def worker(rank, options, logger):
         scaler = GradScaler()
 
         best_loss = np.inf
-        for epoch in range(start_epoch + 1, options.epochs + 1):
+        for epoch in range(start_epoch, options.epochs):
             if options.master:
                 logging.info(f"Starting Epoch {epoch}")
 
@@ -139,14 +139,14 @@ def worker(rank, options, logger):
             end = time.time()
 
             if options.master:
-                logging.info(f"Finished Epoch {epoch}, Time Taken: {end - start:.3f}")
+                logging.info(f"Finished Epoch {epoch + 1}, Time Taken: {end - start:.3f}")
 
             metrics = evaluate(epoch, model, processor, data, options)
 
             if options.master:
-                checkpoint = {"epoch": epoch, "name": options.name, "state_dict": model.state_dict(),
+                checkpoint = {"epoch": epoch + 1, "name": options.name, "state_dict": model.state_dict(),
                               "optimizer": optimizer.state_dict()}
-                torch.save(checkpoint, os.path.join(options.checkpoints_dir_path, f"epoch_{epoch}.pt"))
+                torch.save(checkpoint, os.path.join(options.checkpoints_dir_path, f"epoch_{epoch + 1}.pt"))
                 if ("loss" in metrics):
                     if (metrics["loss"] < best_loss):
                         best_loss = metrics["loss"]

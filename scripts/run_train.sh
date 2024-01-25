@@ -12,13 +12,15 @@ python -m src.main \
 --caption_key='caption' \
 --device_ids 1 \
 --model_name='RN50' \
---epochs='1' \
 --batch_size=16 \
 --lr=5e-4 \
 --num_warmup_steps=10000 \
 --device='gpu' \
 --cylambda1 0.25 \
 --cylambda2 0.25 \
+--log-per-steps=10 \
+--epochs=10 \
+--steps-per-epoch=100 \
 --extra-train-data='/DDN_ROOT/wjpeng/dataset/VL-benchmark/train/' \
 --extra-batch-size=8 \
 --extra-loss-wt=0.2 \
