@@ -18,7 +18,8 @@ class ImageCaptionDataset(Dataset):
         logging.debug(f"Loading aligned data from {path}")
 
         df = pd.read_csv(path, sep=delimiter)
-
+        from IPython import embed
+        embed()
         self.root = os.path.dirname(path)
         self.images = df[image_key].tolist()
         self.captions = processor.process_text(df[caption_key].tolist())
@@ -46,12 +47,8 @@ class ImageCaptionDataset(Dataset):
         else:
             item["input_ids"] = self.captions["input_ids"][idx]
             item["attention_mask"] = self.captions["attention_mask"][idx]
-            try:
-                item["pixel_values"] = self.processor.process_image(
-                    Image.open(os.path.join(self.root, self.images[idx])))
-            except:
-                from IPython import embed
-                embed(header='dataload')
+            item["pixel_values"] = self.processor.process_image(
+                Image.open(os.path.join(self.root, self.images[idx])))
 
         return item
 

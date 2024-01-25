@@ -49,3 +49,4 @@ python -m src.main \
 --extra-train-data='/DDN_ROOT/wjpeng/dataset/VL-benchmark/train/' \
 --extra-batch-size=8 \
 --extra-data-type count existence relative-size absolute-size absolute-spatial relative-spatial
+
