@@ -90,7 +90,7 @@ def worker(rank, options, logger):
     start_epoch = 0
     if options.from_pretrained is not None:
         if os.path.isfile(options.from_pretrained):
-            checkpoint = torch.load(options.checkpoint, map_location=options.device)
+            checkpoint = torch.load(options.from_pretrained, map_location=options.device)
             state_dict = checkpoint["state_dict"]
             if not options.distributed and next(iter(state_dict.items()))[0].startswith("module"):
                 state_dict = {key[len("module."):]: value for key, value in state_dict.items()}

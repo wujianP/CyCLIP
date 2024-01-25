@@ -227,8 +227,6 @@ def load(options, processor):
                                     data_type=extra_data_type,
                                     processor=processor)
         data[f'train-{extra_data_type}'] = dataloader
-    from IPython import embed
-    embed(header='data')
 
     # data["validation"] = get_validation_dataloader(options, processor)
     # data["eval_test"] = get_eval_test_dataloader(options, processor)

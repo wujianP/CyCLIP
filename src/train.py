@@ -94,6 +94,8 @@ def get_loss(umodel, outputs, criterion, options):
 
 
 def train(epoch, model, data, optimizer, scheduler, scaler, options):
+    from IPython import embed
+    embed(header='train')
     dataloader = data["train"]
     if options.distributed:
         dataloader.sampler.set_epoch(epoch)
