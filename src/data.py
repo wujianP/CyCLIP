@@ -9,6 +9,8 @@ from torch.utils.data.distributed import DistributedSampler
 
 from utils.augment_text import _augment_text
 from utils.augment_image import _augment_image
+from typing import Iterator
+from dataclasses import dataclass
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
@@ -216,17 +218,34 @@ def get_eval_train_dataloader(options, processor):
     return dataloader
 
 
+@dataclass
+class DataInfo:
+    dataloader: DataLoader
+    iterator: Iterator
+    sampler: DistributedSampler = None
+
+    def set_epoch(self, epoch):
+        if self.sampler is not None and isinstance(self.sampler, DistributedSampler):
+            self.sampler.set_epoch(epoch)
+
+
 def load(options, processor):
     data = {}
-
-    data["train"] = get_train_dataloader(options, processor)
+    common_dataloader = get_train_dataloader(options, processor)
+    data["train"] = DataInfo(dataloader=common_dataloader,
+                             iterator=iter(common_dataloader),
+                             sampler=common_dataloader.sampler)
     # generate extra data
     from .extra_dataset import get_extra_data
     for extra_data_type in options.extra_data_type:
         dataloader = get_extra_data(args=options,
                                     data_type=extra_data_type,
                                     processor=processor)
-        data[f'train-{extra_data_type}'] = dataloader
+        data[f'train-{extra_data_type}'] = DataInfo(
+            dataloader=dataloader,
+            iterator=iter(dataloader),
+            sampler=dataloader.sampler
+        )
 
     # data["validation"] = get_validation_dataloader(options, processor)
     # data["eval_test"] = get_eval_test_dataloader(options, processor)
