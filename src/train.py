@@ -5,6 +5,7 @@ import logging
 import torch.nn as nn
 import torch.distributed as dist
 from torch.cuda.amp import autocast
+from einops import rearrange
 
 
 def get_loss(umodel, outputs, criterion, options):
@@ -97,10 +98,10 @@ def train(epoch, model, data, optimizer, scheduler, scaler, options):
     from IPython import embed
     embed(header='train')
 
-    dataloader = data["train-common"]
+    dataloader = data["train"]
 
     if options.distributed:
-        data['train-common'].set_epoch(epoch)
+        data['train'].set_epoch(epoch)
         data['train-count'].set_epoch(epoch)
         data['train-relative-size'].set_epoch(epoch)
         data['train-absolute-size'].set_epoch(epoch)
@@ -116,26 +117,93 @@ def train(epoch, model, data, optimizer, scheduler, scaler, options):
 
     start = time.time()
 
-    logging.info(f"Num samples: {dataloader.num_samples}, Num_batches: {dataloader.num_batches}")
-    for index, batch in enumerate(dataloader):
-        step = dataloader.num_batches * epoch + index
+    # logging.info(f"Num samples: {dataloader.num_samples}, Num_batches: {dataloader.num_batches}")
+    # for index, batch in enumerate(dataloader):
+    for index in range(options.steps_per_epoch):
+        step = options.steps_per_epoch * epoch + index
         scheduler(step)
+
+        # >>> get data and resize them >>>
+        try:
+            common_batch = next(data['train'].iterator)
+        except:
+            data['train'].iterator = iter(data['train'].dataloader)
+            common_batch = next(data['train'].iterator)
+        common_images = common_batch[0]
+        common_texts = common_batch[1]
+        n_common = len(common_images)
+
+        try:
+            count_batch = next(data['train-count'].iterator)
+        except:
+            data['train-count'].iterator = iter(data['train-count'].dataloader)
+            count_batch = next(data['train-count'].iterator)
+        count_images = rearrange(count_batch['images'], 'BS_ins hard_num C W H -> (BS_ins hard_num) C W H')
+        count_texts = rearrange(count_batch['texts'], 'BS_ins hard_num L -> (BS_ins hard_num) L')
+        n_count = len(count_images)
+
+        try:
+            rel_size_batch = next(data['train-relative-size'].iterator)
+        except:
+            data['train-relative-size'].iterator = iter(data['train-relative-size'].dataloader)
+            rel_size_batch = next(data['train-relative-size'].iterator)
+        rel_size_images = rearrange(rel_size_batch['images'], 'BS_ins hard_num C W H -> (BS_ins hard_num) C W H')
+        rel_size_texts = rearrange(rel_size_batch['texts'], 'BS_ins hard_num L -> (BS_ins hard_num) L')
+        n_rel_size = len(rel_size_images)
+
+        try:
+            abs_size_batch = next(data['train-absolute-size'].iterator)
+        except:
+            data['train-absolute-size'].iterator = iter(data['train-absolute-size'].dataloader)
+            abs_size_batch = next(data['train-absolute-size'].iterator)
+        abs_size_images = rearrange(abs_size_batch['images'], 'BS_ins hard_num C W H -> (BS_ins hard_num) C W H')
+        abs_size_texts = rearrange(abs_size_batch['texts'], 'BS_ins hard_num L -> (BS_ins hard_num) L')
+        n_abs_size = len(abs_size_images)
+
+        try:
+            rel_spatial_batch = next(data['train-relative-spatial'].iterator)
+        except:
+            data['train-relative-spatial'].iterator = iter(data['train-relative-spatial'].dataloader)
+            rel_spatial_batch = next(data['train-relative-spatial'].iterator)
+        rel_spatial_images = rearrange(rel_spatial_batch['images'], 'BS_ins hard_num C W H -> (BS_ins hard_num) C W H')
+        rel_spatial_texts = rearrange(rel_spatial_batch['texts'], 'BS_ins hard_num L -> (BS_ins hard_num) L')
+        n_rel_spatial = len(rel_spatial_images)
+
+        try:
+            abs_spatial_batch = next(data['train-absolute-spatial'].iterator)
+        except:
+            data['train-absolute-spatial'].iterator = iter(data['train-absolute-spatial'].dataloader)
+            abs_spatial_batch = next(data['train-absolute-spatial'].iterator)
+        abs_spatial_images = rearrange(abs_spatial_batch['images'], 'BS_ins hard_num C W H -> (BS_ins hard_num) C W H')
+        abs_spatial_texts = rearrange(abs_spatial_batch['texts'], 'BS_ins hard_num L -> (BS_ins hard_num) L')
+        n_abs_spatial = len(abs_spatial_images)
+
+        try:
+            existence_batch = next(data['train-existence'].iterator)
+        except:
+            data['train-existence'].iterator = iter(data['train-existence'].dataloader)
+            existence_batch = next(data['train-existence'].iterator)
+        existence_images = rearrange(existence_batch['images'], 'BS_ins hard_num C W H -> (BS_ins hard_num) C W H')
+        existence_texts = rearrange(existence_batch['texts'], 'BS_ins hard_num L -> (BS_ins hard_num) L')
+        n_existence = len(existence_images)
+        # <<< get data and reshape them <<<
 
         optimizer.zero_grad()
 
         if options.inmodal:
-            input_ids, attention_mask, pixel_values = batch["input_ids"][0].to(options.device, non_blocking=True), \
-            batch["attention_mask"][0].to(options.device, non_blocking=True), batch["pixel_values"][0].to(
-                options.device, non_blocking=True)
-            augmented_input_ids, augmented_attention_mask, augmented_pixel_values = batch["input_ids"][1].to(
-                options.device, non_blocking=True), batch["attention_mask"][1].to(options.device, non_blocking=True), \
-            batch["pixel_values"][1].to(options.device, non_blocking=True)
-            input_ids = torch.cat([input_ids, augmented_input_ids])
-            attention_mask = torch.cat([attention_mask, augmented_attention_mask])
-            pixel_values = torch.cat([pixel_values, augmented_pixel_values])
+            raise KeyError
+            # input_ids, attention_mask, pixel_values = batch["input_ids"][0].to(options.device, non_blocking=True), \
+            # batch["attention_mask"][0].to(options.device, non_blocking=True), batch["pixel_values"][0].to(
+            #     options.device, non_blocking=True)
+            # augmented_input_ids, augmented_attention_mask, augmented_pixel_values = batch["input_ids"][1].to(
+            #     options.device, non_blocking=True), batch["attention_mask"][1].to(options.device, non_blocking=True), \
+            # batch["pixel_values"][1].to(options.device, non_blocking=True)
+            # input_ids = torch.cat([input_ids, augmented_input_ids])
+            # attention_mask = torch.cat([attention_mask, augmented_attention_mask])
+            # pixel_values = torch.cat([pixel_values, augmented_pixel_values])
         else:
-            input_ids, attention_mask, pixel_values = batch["input_ids"].to(options.device, non_blocking=True), batch[
-                "attention_mask"].to(options.device, non_blocking=True), batch["pixel_values"].to(options.device,
+            input_ids, attention_mask, pixel_values = common_batch["input_ids"].to(options.device, non_blocking=True), common_batch[
+                "attention_mask"].to(options.device, non_blocking=True), common_batch["pixel_values"].to(options.device,
                                                                                                   non_blocking=True)
 
         outputs = model(input_ids=input_ids, attention_mask=attention_mask, pixel_values=pixel_values)
