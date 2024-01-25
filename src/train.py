@@ -112,9 +112,6 @@ def train(epoch, model, data, optimizer, scheduler, scaler, options):
     # for index, batch in enumerate(dataloader):
     for index in range(options.steps_per_epoch):
 
-        from IPython import embed
-        embed(header='in-loop-train')
-
         step = options.steps_per_epoch * epoch + index
         scheduler(step)
 
