@@ -51,6 +51,7 @@ def parse_args():
     parser.add_argument("--extra-batch-size", type=int, default=8)
     parser.add_argument("--extra-data-type", type=str, nargs='+', choices=['count', 'relative-size', 'absolute-size', 'relative-spatial', 'absolute-spatial', 'existence'])
     parser.add_argument("--steps-per-epoch", type=int, default=100)
+    parser.add_argument("--from-pretrained", type=str, help='the path to pretrained checkpoint')
 
     options = parser.parse_args()
     return options

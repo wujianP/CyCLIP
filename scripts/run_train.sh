@@ -36,7 +36,7 @@ python -m src.main \
 --name='exp1' \
 --train_data='/discobox/wjpeng/dataset/cc3m/data/train/train_all_filtered.csv' \
 --validation_data='/discobox/wjpeng/dataset/cc3m/data/val/train_filtered.csv' \
---checkpoint='/DDN_ROOT/wjpeng/weights/cyclip/cyclip.pt' \
+--from-pretrained='/DDN_ROOT/wjpeng/weights/cyclip/cyclip.pt' \
 --image_key='image' \
 --caption_key='caption' \
 --device_ids 1 \

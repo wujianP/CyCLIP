@@ -74,6 +74,16 @@ def get_train_dataloader(options, processor):
     return dataloader
 
 
+def get_extra_train_dataloader(options, processor):
+    path = options.extra_train_data
+    if path is None:
+        return None
+
+    batch_size = options.extra_batch_soze
+
+
+
+
 def get_validation_dataloader(options, processor):
     path = options.validation_data
     if (path is None): return
@@ -220,8 +230,17 @@ def load(options, processor):
     data = {}
 
     data["train"] = get_train_dataloader(options, processor)
-    data["validation"] = get_validation_dataloader(options, processor)
-    data["eval_test"] = get_eval_test_dataloader(options, processor)
-    data["eval_train"] = get_eval_train_dataloader(options, processor)
+    # generate extra data
+    from .extra_dataset import get_extra_data
+    for extra_data_type in options.extra_data_type:
+        dataloader = get_extra_data(args=options,
+                                    data_type=extra_data_type,
+                                    processor=processor)
+        # data[f'train-{extra_data_type}'] = DataInfo(dataloader=dataloader,
+        #                                             iterator=iter(dataloader),
+        #                                             sampler=dataloader.sampler)
+    # data["validation"] = get_validation_dataloader(options, processor)
+    # data["eval_test"] = get_eval_test_dataloader(options, processor)
+    # data["eval_train"] = get_eval_train_dataloader(options, processor)
 
     return data

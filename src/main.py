@@ -88,20 +88,29 @@ def worker(rank, options, logger):
                                      data["train"].num_batches * options.epochs)
 
     start_epoch = 0
-    from IPython import embed
-    embed(header='checkpoint')
-    if options.checkpoint is not None:
-        if os.path.isfile(options.checkpoint):
+    if options.from_pretrained is not None:
+        if os.path.isfile(options.from_pretrained):
             checkpoint = torch.load(options.checkpoint, map_location=options.device)
-            start_epoch = checkpoint["epoch"]
             state_dict = checkpoint["state_dict"]
             if not options.distributed and next(iter(state_dict.items()))[0].startswith("module"):
                 state_dict = {key[len("module."):]: value for key, value in state_dict.items()}
             model.load_state_dict(state_dict)
-            if optimizer is not None: optimizer.load_state_dict(checkpoint["optimizer"])
-            logging.info(f"Loaded checkpoint '{options.checkpoint}' (start epoch {checkpoint['epoch']})")
         else:
             logging.info(f"No checkpoint found at {options.checkpoint}")
+
+    if options.checkpoint is not None:
+        raise KeyError('Not support by wujian')
+        # if os.path.isfile(options.checkpoint):
+        #     checkpoint = torch.load(options.checkpoint, map_location=options.device)
+        #     start_epoch = checkpoint["epoch"]
+        #     state_dict = checkpoint["state_dict"]
+        #     if not options.distributed and next(iter(state_dict.items()))[0].startswith("module"):
+        #         state_dict = {key[len("module."):]: value for key, value in state_dict.items()}
+        #     model.load_state_dict(state_dict)
+        #     if optimizer is not None: optimizer.load_state_dict(checkpoint["optimizer"])
+        #     logging.info(f"Loaded checkpoint '{options.checkpoint}' (start epoch {checkpoint['epoch']})")
+        # else:
+        #     logging.info(f"No checkpoint found at {options.checkpoint}")
 
     cudnn.benchmark = True
     cudnn.deterministic = False
