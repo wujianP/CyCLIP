@@ -88,6 +88,8 @@ def worker(rank, options, logger):
                                      data["train"].num_batches * options.epochs)
 
     start_epoch = 0
+    from IPython import embed
+    embed(header='checkpoint')
     if options.checkpoint is not None:
         if os.path.isfile(options.checkpoint):
             checkpoint = torch.load(options.checkpoint, map_location=options.device)

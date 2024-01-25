@@ -25,8 +25,8 @@ def filter_csv(input_file, output_file):
 
 
 if __name__ == "__main__":
-    input_filename = "train.csv"  # 替换为您的输入文件名
-    output_filename = "train_filtered.csv"  # 替换为您的输出文件名
+    input_filename = "train_all.csv"  # 替换为您的输入文件名
+    output_filename = "train_all_filtered.csv"  # 替换为您的输出文件名
 
     filtered_rows_count = filter_csv(input_filename, output_filename)
 

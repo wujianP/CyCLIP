@@ -27,17 +27,19 @@ python -m src.main \
 --pretrained=''
 
 
+# 单卡debug
 cd /discobox/wjpeng/code/2024/CyCLIP
 conda activate /discobox/wjpeng/env/cyCLIP
 rm -rf /discobox/wjpeng/ckp/betterCLIP/debug
 python -m src.main \
 --log='/discobox/wjpeng/ckp/betterCLIP/debug' \
 --name='exp1' \
---train_data='/discobox/wjpeng/dataset/cc3m/data/val/train_filtered.csv' \
+--train_data='/discobox/wjpeng/dataset/cc3m/data/train/train_all_filtered.csv' \
 --validation_data='/discobox/wjpeng/dataset/cc3m/data/val/train_filtered.csv' \
+--checkpoint='/DDN_ROOT/wjpeng/weights/cyclip/cyclip.pt' \
 --image_key='image' \
 --caption_key='caption' \
---device_ids 0\
+--device_ids 1 \
 --model_name='RN50' \
 --epochs='1' \
 --batch_size=128 \
