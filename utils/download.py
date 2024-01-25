@@ -76,8 +76,7 @@ def multiprocess(df, function, dir, hash):
         return df
 
 def run(options):
-    from IPython import embed
-    embed()
+
     os.makedirs(options.dir, exist_ok = True)
     os.makedirs(os.path.join(options.dir, "images"), exist_ok = True)
     
@@ -86,7 +85,7 @@ def run(options):
     df = df[options.start:options.end]
     
     df = multiprocess(df, function = download, dir = options.dir, hash = options.hash)    
-    df.to_csv(f"{options.dir}/{options.file.split('.')[0]}.csv", index = False)
+    df.to_csv(f"{options.dir}/{options.file.split('.')[0].split('/')[-1]}.csv", index = False)
 
 if(__name__ == "__main__"):
     parser = argparse.ArgumentParser()
