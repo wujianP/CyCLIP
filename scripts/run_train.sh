@@ -21,6 +21,7 @@ python -m src.main \
 --cylambda2 0.25 \
 --extra-train-data='/DDN_ROOT/wjpeng/dataset/VL-benchmark/train/' \
 --extra-batch-size=8 \
+--extra-loss-wt=0.2 \
 --extra-data-type count existence relative-size absolute-size absolute-spatial relative-spatial \
 --extra-ann-root='/DDN_ROOT/wjpeng/dataset/VL-benchmark/train/captions_expanded/'
 

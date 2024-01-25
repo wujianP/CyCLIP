@@ -123,7 +123,7 @@ def train(epoch, model, data, optimizer, scheduler, scaler, options):
         step = options.steps_per_epoch * epoch + index
         scheduler(step)
 
-        # >>> get data and resize them >>>
+        # >>> get data and resize, concatenate them >>>
         try:
             common_batch = next(data['train'].iterator)
         except:
@@ -186,7 +186,7 @@ def train(epoch, model, data, optimizer, scheduler, scaler, options):
         existence_images = rearrange(existence_batch['images'], 'BS_ins hard_num C W H -> (BS_ins hard_num) C W H')
         existence_texts = rearrange(existence_batch['texts'], 'BS_ins hard_num L -> (BS_ins hard_num) L')
         n_existence = len(existence_images)
-        # <<< get data and reshape them <<<
+        # <<< get data and reshape, concatenate them <<<
 
         optimizer.zero_grad()
 

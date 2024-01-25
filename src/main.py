@@ -85,7 +85,7 @@ def worker(rank, options, logger):
                                  {"params": weight_decay_parameters, "weight_decay": options.weight_decay}],
                                 lr=options.lr, betas=(options.beta1, options.beta2), eps=options.eps)
         scheduler = cosine_scheduler(optimizer, options.lr, options.num_warmup_steps,
-                                     data["train"].num_batches * options.epochs)
+                                     options.steps_per_epoch * options.epochs)
 
     start_epoch = 0
     if options.from_pretrained is not None:
