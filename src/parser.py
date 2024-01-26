@@ -58,7 +58,7 @@ def parse_args():
     parser.add_argument("--from-pretrained", type=str, help='the path to pretrained checkpoint')
     parser.add_argument("--log-per-steps", type=int, default=10)
     parser.add_argument("--save_per_epoch", type=int, default=1)
-    parser.add_argument("--save_most_recent", type=bool, action='store_true')
-
+    parser.add_argument("--save_most_recent", action='store_true')
+    parser.add_argument("--do-not-eval-epoch-0", action='store_true')
     options = parser.parse_args()
     return options
