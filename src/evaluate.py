@@ -222,13 +222,14 @@ def evaluate(epoch, model, processor, options):
     vl_log_info = "SPEC Benchmark:\n" + "\n".join(
         [f"{acc_name.capitalize()} i2T-acc: {acc['i2t_acc']:#.2f}  t2I-acc: {acc['t2i_acc']:#.2f}"
          for acc_name, acc in vl_result.items()])
-    logging.info(vl_log_info)
+    if options.master:
+        logging.info(vl_log_info)
 
     vl_log_data = {}
     for (bench_nm, bench_acc) in vl_result.items():
         vl_log_data[f'vl_eval/{bench_nm}-i2t'] = bench_acc['i2t_acc']
         vl_log_data[f'vl_eval/{bench_nm}-t2i'] = bench_acc['t2i_acc']
-    if options.wandb:
+    if options.wandb and options.master:
         wandb.log(vl_log_data)
 
     # >>> STEP 2: evaluate on Common Benchmark (zero-shot)
@@ -240,7 +241,7 @@ def evaluate(epoch, model, processor, options):
     home_dir = os.path.expanduser("~")
     temp_dir = os.path.join(home_dir, '.cache', 'cyclip')
     os.makedirs(temp_dir, exist_ok=True)
-    checkpoint_path = os.path.join(temp_dir, f"checkpoint.pt")
+    checkpoint_path = os.path.join(temp_dir, f"checkpoint_{options.rank}.pt")
     torch.save(checkpoint_dict, checkpoint_path)
 
     common_result = common_eval(model_name=options.model_name,
@@ -254,15 +255,15 @@ def evaluate(epoch, model, processor, options):
     common_log_info = "Zero-shot Benchmark:\n" + "\n".join(
         [f"{bench_nm.capitalize()} {' '.join(metric for metric in metrics)}"
          for bench_nm, metrics in common_result.items()])
-    logging.info(common_log_info)
+    if options.master:
+        logging.info(common_log_info)
     common_log_data = {}
     for (bench_nm, metrics) in common_result.items():
         for m in metrics:
             metric_nm = m.split(': ')[0]
             metric_value = eval(m.split(': ')[1])
             common_log_data[f'common_eval/{bench_nm}-{metric_nm}'] = metric_value
-    if options.wandb:
+    if options.wandb and options.master:
         wandb.log(common_log_data)
-
 
     model.train()

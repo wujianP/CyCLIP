@@ -153,8 +153,9 @@ def worker(rank, options, logger):
 
         for epoch in range(start_epoch, options.epochs):
             # >>> eval before training begin >>>
-            if epoch == 0 and options.master and (not options.do_not_eval_epoch_0):
-                logging.info(f'Start Evaluation before the : The Baseline Without Training')
+            if epoch == 0 and (not options.do_not_eval_epoch_0):
+                if options.master:
+                    logging.info(f'Start Evaluation before the : The Baseline Without Training')
                 evaluate(epoch=epoch, model=model, processor=processor, options=options)
 
             # >>> training one epoch >>>
@@ -169,7 +170,7 @@ def worker(rank, options, logger):
             # >>> eval one epoch >>>
             if options.master:
                 logging.info(f'Start Evaluating Epoch {epoch + 1} /  {options.epochs}')
-                evaluate(epoch=epoch, model=model, processor=processor, options=options)
+            evaluate(epoch=epoch, model=model, processor=processor, options=options)
 
             # >>> save checkpoints >>>
             if options.master:
