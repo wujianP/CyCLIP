@@ -22,8 +22,8 @@ python -m src.main \
 --extra-loss-wt=0.2 \
 --extra-data-type count existence relative-size absolute-size absolute-spatial relative-spatial \
 --extra-ann-root='/DDN_ROOT/wjpeng/dataset/VL-benchmark/train/captions_expanded/' \
---val-batch-size=32 \
---val-workers=6 \
+--val-batch-size=16 \
+--val-workers=8 \
 --val-common-data-root='/DDN_ROOT/wjpeng/dataset/clip_benchmark_datasets' \
 --val-vl-data-root='/DDN_ROOT/wjpeng/dataset/VL-benchmark/clean_val_v3/data' \
 --wandb \

@@ -249,7 +249,6 @@ def evaluate(epoch, model, processor, options):
     if options.wandb:
         wandb.log(common_log_data)
 
-
     # >>> STEP 1: evaluate on VL Benchmark (ours)
     vl_result = vl_eval(args=options, model=model, processor=processor)
 

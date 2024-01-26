@@ -7,7 +7,7 @@ from PIL import Image
 
 
 class BaseDataset(Dataset):
-    def __init__(self, data_root, ann, processor):
+    def __init__(self, data_root, ann, processor, mini_dataset=False):
         """
         Args:
             data_root: the path to the root dir of data
@@ -15,18 +15,21 @@ class BaseDataset(Dataset):
         """
         self.data_root = data_root
         self.processor = processor
+        self.mini_dataset = mini_dataset
         with open(ann, 'r') as f:
             self.sample_list = json.load(f)
         f.close()
+        if self.mini_dataset:
+            self.sample_list = self.sample_list[:20]
 
     def __len__(self):
         return len(self.sample_list)
 
 
 class Image2TextDataset(BaseDataset):
-    def __init__(self, data_root, processor):
+    def __init__(self, data_root, processor, mini_dataset=False):
         ann = os.path.join(data_root, 'image2text_anns.json')
-        super().__init__(data_root, ann, processor)
+        super().__init__(data_root, ann, processor, mini_dataset)
 
     def __getitem__(self, idx):
         sample_info = self.sample_list[idx]
@@ -56,9 +59,9 @@ class Image2TextDataset(BaseDataset):
 
 
 class Text2ImageDataset(BaseDataset):
-    def __init__(self, data_root, processor):
+    def __init__(self, data_root, processor, mini_dataset=False):
         ann = os.path.join(data_root, 'text2image_anns.json')
-        super().__init__(data_root, ann, processor)
+        super().__init__(data_root, ann, processor, mini_dataset)
 
     def __getitem__(self, idx):
         sample_info = self.sample_list[idx]
@@ -90,15 +93,15 @@ class Text2ImageDataset(BaseDataset):
         return sample
 
 
-def get_data(data_root, processor):
+def get_data(data_root, processor, mini_dataset):
     """return the datasets for selected evaluation-real benchmarks"""
 
     data = []
     for dn in ['count', 'existence', 'absolute-spatial', 'relative-spatial', 'absolute-size', 'relative-size']:
 
         ann_filename = dn.replace('-', '_')
-        i2t_dataset = Image2TextDataset(data_root=os.path.join(data_root, ann_filename), processor=processor)
-        t2i_dataset = Text2ImageDataset(data_root=os.path.join(data_root, ann_filename), processor=processor)
+        i2t_dataset = Image2TextDataset(data_root=os.path.join(data_root, ann_filename), processor=processor, mini_dataset=mini_dataset)
+        t2i_dataset = Text2ImageDataset(data_root=os.path.join(data_root, ann_filename), processor=processor, mini_dataset=mini_dataset)
         bench = {
             'name': dn,
             'i2t_dataset': i2t_dataset,
