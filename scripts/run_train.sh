@@ -10,10 +10,10 @@ python -m src.main \
 --distributed \
 --device_ids 0 1 2 3 4 5 6 7 \
 --model_name='RN50' \
---batch_size=128 \
+--batch_size=64 \
 --lr=1e-6 \
 --epochs=10 \
---steps-per-epoch=200 \
+--steps-per-epoch=400 \
 --num_warmup_steps=1000 \
 --cylambda1 0.25 \
 --cylambda2 0.25 \
@@ -28,8 +28,9 @@ python -m src.main \
 --val-common-data-root='/DDN_ROOT/wjpeng/dataset/clip_benchmark_datasets' \
 --val-vl-data-root='/DDN_ROOT/wjpeng/dataset/VL-benchmark/clean_val_v3/data' \
 --wandb \
---wandb-project-name='test' \
+--wandb-project-name='cyCLIP_SPEC' \
 --wandb-key='8cff0498531e0409db5f3c43b52a26b0d068f2dc'
+
  \
 --do-not-eval-epoch-0
 

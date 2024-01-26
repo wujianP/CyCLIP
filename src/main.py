@@ -135,11 +135,10 @@ def worker(rank, options, logger):
                        id=options.name,
                        notes=options.notes,
                        tags=[],
+                       resume=None,
                        config=vars(options))
-            wandb.run.name = options.name
+            # wandb.run.name = options.name
             wandb.save(os.path.join(options.log_dir_path, "params.txt"))
-
-    # evaluate(start_epoch, model, processor, data, options)
 
     # training epoch by epoch
     if data["train"] is not None:
