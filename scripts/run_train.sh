@@ -34,7 +34,8 @@ python -m src.main \
 --val-common-data-root='/DDN_ROOT/wjpeng/dataset/clip_benchmark_datasets' \
 --val-vl-data-root='/DDN_ROOT/wjpeng/dataset/VL-benchmark/clean_val_v3/data' \
 --wandb \
---wandb-project-name='test'
+--wandb-project-name='test' \
+--wandb-key='8cff0498531e0409db5f3c43b52a26b0d068f2dc'
 
 
 

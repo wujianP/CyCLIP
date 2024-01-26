@@ -127,9 +127,9 @@ def worker(rank, options, logger):
     if options.wandb and options.master:
         wandb_login_success = wandb.login(key=options.wandb_key, timeout=30)
         if not wandb_login_success:
-            logging.debug("Wandb init Failed!!!")
+            logging.info("Wandb init Failed!!!")
         else:
-            logging.debug("Starting wandb")
+            logging.info("Starting wandb")
             wandb.init(project=options.wandb_project_name,
                        name=options.name,
                        id=options.name,
