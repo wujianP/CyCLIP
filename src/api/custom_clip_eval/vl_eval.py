@@ -9,8 +9,8 @@ grandparent_dir = os.path.dirname(parent_dir)
 sys.path.append(parent_dir)
 sys.path.append(grandparent_dir)
 
-from vl_dataset import get_data
-from clip_models import CLIPWrapper
+from .vl_dataset import get_data
+from .clip_models import CLIPWrapper
 
 
 @torch.no_grad()

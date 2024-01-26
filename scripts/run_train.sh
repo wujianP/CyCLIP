@@ -11,7 +11,6 @@ python -m src.main \
 --image_key='image' \
 --caption_key='caption' \
 --device_ids 0 1 2 3 4 5 6 7 \
---distributed \
 --model_name='RN50' \
 --batch_size=64 \
 --lr=5e-6 \
@@ -32,6 +31,9 @@ python -m src.main \
 --val-batch-size=64 \
 --val-workers=8 \
 --val-common-data-root='/DDN_ROOT/wjpeng/dataset/clip_benchmark_datasets'
+
+
+--distributed \
 
 
 
