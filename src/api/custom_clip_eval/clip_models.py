@@ -42,6 +42,10 @@ class CLIPWrapper:
         i2t_correct_num = 0
         for batch in tqdm_i2t_loader:
             bs = len(batch['label'])
+            pixel_values = batch['pixel_values']
+            input_ids = batch['input_ids']
+            attention_mask = batch['attention_mask']
+
             query_images = batch['query_image'].cuda()  # B,C,H,W (B:batch size)
             candidate_texts = batch['candidate_texts'].cuda()  # B,L,S (L:num of candidate texts, S:sentence length)
 

@@ -30,7 +30,8 @@ python -m src.main \
 --save_most_recent \
 --val-batch-size=64 \
 --val-workers=8 \
---val-common-data-root='/DDN_ROOT/wjpeng/dataset/clip_benchmark_datasets'
+--val-common-data-root='/DDN_ROOT/wjpeng/dataset/clip_benchmark_datasets' \
+--val-vl-data-root='/DDN_ROOT/wjpeng/dataset/VL-benchmark/clean_val_v3/data'
 
 
 --distributed \
