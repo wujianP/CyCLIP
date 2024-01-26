@@ -163,6 +163,7 @@ def worker(rank, options, logger):
                 logging.info(f"Starting Training Epoch {epoch + 1} / {options.epochs}")
             start = time.time()
             train(epoch, model, data, optimizer, scheduler, scaler, options)
+            torch.cuda.empty_cache()
             end = time.time()
             if options.master:
                 logging.info(f"Finished Training Epoch {epoch + 1} / {options.epochs}, Time Taken Per Epoch: {seconds_to_hms(end - start)}")
