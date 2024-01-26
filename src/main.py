@@ -126,7 +126,12 @@ def worker(rank, options, logger):
 
     if options.wandb and options.master:
         logging.debug("Starting wandb")
-        wandb.init(project=options.wandb_project_name, notes=options.notes, tags=[], config=vars(options))
+        wandb.init(project=options.wandb_project_name,
+                   name=options.name,
+                   id=options.name,
+                   notes=options.notes,
+                   tags=[],
+                   config=vars(options))
         wandb.run.name = options.name
         wandb.save(os.path.join(options.log_dir_path, "params.txt"))
 
