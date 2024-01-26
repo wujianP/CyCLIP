@@ -31,6 +31,14 @@ mp.set_start_method("spawn", force=True)
 warnings.filterwarnings("ignore")
 
 
+def seconds_to_hms(t):
+    hours = int(t // 3600)
+    minutes = int((t % 3600) // 60)
+    seconds = int(t % 60)
+
+    return f'{hours:02d} h, {minutes:02d} m, {seconds:02d} s'
+
+
 def worker(rank, options, logger):
     options.rank = rank
     options.master = rank == 0
@@ -54,7 +62,7 @@ def worker(rank, options, logger):
         dist.init_process_group(backend=options.distributed_backend, init_method=options.distributed_init_method,
                                 world_size=options.num_devices, rank=options.rank)
 
-    options.batch_size = options.batch_size // options.num_devices
+    # options.batch_size = options.batch_size // options.num_devices
 
     model, processor = load_model(name=options.model_name, pretrained=options.pretrained)
 
@@ -88,6 +96,7 @@ def worker(rank, options, logger):
                                      options.steps_per_epoch * options.epochs)
 
     start_epoch = 0
+    # load pretrained model weights
     if options.from_pretrained is not None:
         if os.path.isfile(options.from_pretrained):
             checkpoint = torch.load(options.from_pretrained, map_location=options.device)
@@ -117,12 +126,13 @@ def worker(rank, options, logger):
 
     if options.wandb and options.master:
         logging.debug("Starting wandb")
-        wandb.init(project="mrl", notes=options.notes, tags=[], config=vars(options))
+        wandb.init(project=options.wandb_project_name, notes=options.notes, tags=[], config=vars(options))
         wandb.run.name = options.name
         wandb.save(os.path.join(options.log_dir_path, "params.txt"))
 
     # evaluate(start_epoch, model, processor, data, options)
 
+    # training epoch by epoch
     if data["train"] is not None:
         options.checkpoints_dir_path = os.path.join(options.log_dir_path, "checkpoints")
         os.makedirs(options.checkpoints_dir_path, exist_ok=True)
@@ -131,31 +141,40 @@ def worker(rank, options, logger):
 
         best_loss = np.inf
         for epoch in range(start_epoch, options.epochs):
+            # training one epoch
             if options.master:
                 logging.info(f"Starting Epoch {epoch}")
-
             start = time.time()
             train(epoch, model, data, optimizer, scheduler, scaler, options)
             end = time.time()
-
             if options.master:
-                logging.info(f"Finished Epoch {epoch + 1}, Time Taken: {end - start:.3f}")
+                logging.info(f"Finished Epoch {epoch + 1}, Time Taken Per Epoch: {seconds_to_hms(end - start)}")
 
-            metrics = evaluate(epoch, model, processor, data, options)
+            # metrics = evaluate(epoch, model, processor, data, options)
 
+            # save checkpoints
             if options.master:
-                checkpoint = {"epoch": epoch + 1, "name": options.name, "state_dict": model.state_dict(),
-                              "optimizer": optimizer.state_dict()}
-                torch.save(checkpoint, os.path.join(options.checkpoints_dir_path, f"epoch_{epoch + 1}.pt"))
-                if ("loss" in metrics):
-                    if (metrics["loss"] < best_loss):
-                        best_loss = metrics["loss"]
-                        torch.save(checkpoint, os.path.join(options.checkpoints_dir_path, f"epoch.best.pt"))
+                checkpoint = {"epoch": epoch + 1,
+                              "name": options.name,
+                              "state_dict": model.state_dict(),
+                              "optimizer": optimizer.state_dict(),
+                              "scaler": scaler.state_dict() if scaler is not None else None
+                              }
+                # period save
+                if (epoch + 1) == options.epochs or ((epoch + 1) % options.save_per_epoch == 0):
+                    torch.save(checkpoint, os.path.join(options.checkpoints_dir_path, f"epoch_{epoch + 1}.pt"))
+                # latest save
+                if options.save_most_recent:
+                    # try not to corrupt the latest checkpoint if save fails
+                    tmp_save_path = os.path.join(options.checkpoints_dir_path, "tmp.pt")
+                    latest_save_path = os.path.join(options.checkpoints_dir_path, "epoch_latest.pt")
+                    torch.save(checkpoint, tmp_save_path)
+                    os.replace(tmp_save_path, latest_save_path)
 
     if options.distributed:
         dist.destroy_process_group()
 
-    if (options.wandb and options.master):
+    if options.wandb and options.master:
         wandb.finish()
 
 

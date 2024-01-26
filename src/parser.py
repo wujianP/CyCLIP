@@ -31,6 +31,7 @@ def parse_args():
     parser.add_argument("--device_ids", nargs = "+", default = None, help = "Specify device ids if using multiple gpus")
     parser.add_argument("--wandb", action = "store_true", default = False, help = "Enable wandb logging")
     parser.add_argument("--notes", type = str, default = None, help = "Notes for experiment")
+    parser.add_argument("--wandb-project-name", type = str, default = 'CyCLIP', help = "Project name for experiment")
     parser.add_argument("--num_workers", type = int, default = 8, help = "Number of workers per gpu")
     parser.add_argument("--inmodal", action = "store_true", default = False, help = "Inmodality Training")
     parser.add_argument("--epochs", type = int, default = 64, help = "Number of train epochs")
@@ -56,6 +57,8 @@ def parse_args():
     parser.add_argument("--steps-per-epoch", type=int, default=100)
     parser.add_argument("--from-pretrained", type=str, help='the path to pretrained checkpoint')
     parser.add_argument("--log-per-steps", type=int, default=10)
+    parser.add_argument("--save_per_epoch", type=int, default=1)
+    parser.add_argument("--save_most_recent", type=bool, action='store_true')
 
     options = parser.parse_args()
     return options
