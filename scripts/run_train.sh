@@ -1,9 +1,8 @@
-
 cd /discobox/wjpeng/code/2024/CyCLIP
 conda activate /discobox/wjpeng/env/cyCLIP
 python -m src.main \
 --logs='/discobox/wjpeng/ckp/betterCLIP/rebuttal' \
---name='rn50-cyclip_ep10-step200_lr1e-6-warm1000_common-cc3m-bs128_extra-wt0.2-bs8-hn2' \
+--name='rn50-cyclip_ep10-step200_lr1e-6-warm1000_common-cc3m-bs128_extra-wt0.2-bs8-hn2---' \
 --log-per-steps=20 \
 --train_data='/discobox/wjpeng/dataset/cc3m/data/train/train_all_filtered.csv' \
 --from-pretrained='/DDN_ROOT/wjpeng/weights/cyclip/cyclip.pt' \
@@ -29,14 +28,8 @@ python -m src.main \
 --val-vl-data-root='/DDN_ROOT/wjpeng/dataset/VL-benchmark/clean_val_v3/data' \
 --wandb \
 --wandb-project-name='cyCLIP_SPEC' \
---wandb-key='8cff0498531e0409db5f3c43b52a26b0d068f2dc'
-
- \
+--wandb-key='8cff0498531e0409db5f3c43b52a26b0d068f2dc' \
 --do-not-eval-epoch-0
-
-
-
-
 
 
 

@@ -64,7 +64,9 @@ def worker(rank, options, logger):
 
     # options.batch_size = options.batch_size // options.num_devices
 
+    logging.info(f"Loading Model Begin")
     model, processor = load_model(name=options.model_name, pretrained=options.pretrained)
+    logging.info(f"Loading Model Finished")
 
     if options.device == "cpu":
         model.float()
@@ -74,7 +76,9 @@ def worker(rank, options, logger):
         if options.distributed:
             model = DDP(model, device_ids=[options.device_ids[options.rank]])
 
+    logging.info(f"Loading Data Begin")
     data = load_data(options, processor)
+    logging.info(f"Loading Data Finished")
 
     optimizer = None
     scheduler = None
