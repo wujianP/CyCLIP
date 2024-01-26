@@ -29,8 +29,6 @@ class CLIPWrapper:
 
     @torch.no_grad()
     def i2t_evaluate(self, benchmark, batch_size, num_workers):
-        from IPython import embed
-        embed(header='in i2t-eval')
         i2t_loader = DataLoader(dataset=benchmark['i2t_dataset'],
                                 batch_size=batch_size,
                                 num_workers=num_workers,
@@ -42,18 +40,16 @@ class CLIPWrapper:
         i2t_correct_num = 0
         for batch in tqdm_i2t_loader:
             bs = len(batch['label'])
-            pixel_values = batch['pixel_values']
-            input_ids = batch['input_ids']
-            attention_mask = batch['attention_mask']
+            pixel_values = batch['pixel_values'].cuda()  # B,C,H,W (B:batch size)
+            input_ids = batch['input_ids'].cuda()  # B,L,S (L:num of candidate texts, S:sentence length)
+            attention_mask = batch['attention_mask'].cuda()  # B,L
 
-            query_images = batch['query_image'].cuda()  # B,C,H,W (B:batch size)
-            candidate_texts = batch['candidate_texts'].cuda()  # B,L,S (L:num of candidate texts, S:sentence length)
-
-            image_embeddings = self.model.encode_image(query_images)  # B,D (D:feature dim)
+            image_embeddings = self.model.get_image_features(pixel_values=pixel_values)  # B,D (D:feature dim)
             image_embeddings /= image_embeddings.norm(dim=-1, keepdim=True)
 
-            candidate_texts = rearrange(candidate_texts, 'B L S -> (B L) S')
-            text_embeddings = self.model.encode_text(candidate_texts)  # BL,D (D:feature dim)
+            input_ids = rearrange(input_ids, 'B L S -> (B L) S')
+            attention_mask = rearrange(attention_mask, 'B L -> (B L)')
+            text_embeddings = self.model.get_text_features(input_ids=input_ids, attention_mask=attention_mask)  # BL,D (D:feature dim)
             text_embeddings /= text_embeddings.norm(dim=-1, keepdim=True)
             text_embeddings = rearrange(text_embeddings, '(B L) D -> B L D', B=bs)
 
@@ -72,8 +68,6 @@ class CLIPWrapper:
 
     @torch.no_grad()
     def t2i_evaluate(self, benchmark, batch_size, num_workers):
-        from IPython import embed
-        embed(header='in t2i-eval')
         t2i_loader = DataLoader(dataset=benchmark['t2i_dataset'],
                                 batch_size=batch_size,
                                 num_workers=num_workers,
@@ -85,18 +79,17 @@ class CLIPWrapper:
         t2i_correct_num = 0
         for batch in tqdm_t2i_loader:
             bs = len(batch['label'])
-            query_texts = batch['query_text'].cuda()  # B,1,S (B:batch size, S:sentence length)
-            query_texts = rearrange(query_texts, 'B 1 S -> (B 1) S')
+            pixel_values = batch['pixel_values'].cuda()  # B,K,C,H,W (K:num of candidate images per case, S:sentence length)
+            input_ids = batch['input_ids'].cuda()  # B,1,S (B:batch size, S:sentence length)
+            attention_mask = batch['attention_mask'].cuda()  # B,1
 
-            candidate_images = batch[
-                'candidate_images'].cuda()  # B,K,C,H,W (K:num of candidate images per case, S:sentence length)
-            candidate_images = rearrange(candidate_images, 'B K C H W -> (B K) C H W')
-
-            text_embeddings = self.model.encode_text(query_texts)  # B,D (D:feature dim)
+            input_ids = rearrange(input_ids, 'B 1 S -> (B 1) S')
+            attention_mask = rearrange(attention_mask, 'B 1 -> (B 1)')
+            text_embeddings = self.model.get_text_features(input_ids=input_ids, attention_mask=attention_mask)  # B,D (D:feature dim)
             text_embeddings /= text_embeddings.norm(dim=-1, keepdim=True)
 
-            image_embeddings = self.model.encode_image(
-                candidate_images)  # BK,D (K:num of candidate images per case, D:feature dim)
+            pixel_values = rearrange(pixel_values, 'B K C H W -> (B K) C H W')
+            image_embeddings = self.model.get_image_features(pixel_values=pixel_values)  # BK,D (K:num of candidate images per case, D:feature dim)
             image_embeddings /= image_embeddings.norm(dim=-1, keepdim=True)
             image_embeddings = rearrange(image_embeddings, '(B K) D -> B K D', B=bs)
 
