@@ -10,6 +10,7 @@ python -m src.main \
 --from-pretrained='/DDN_ROOT/wjpeng/weights/cyclip/cyclip.pt' \
 --image_key='image' \
 --caption_key='caption' \
+--distributed \
 --device_ids 0 1 2 3 4 5 6 7 \
 --model_name='RN50' \
 --batch_size=64 \
@@ -31,10 +32,11 @@ python -m src.main \
 --val-batch-size=64 \
 --val-workers=8 \
 --val-common-data-root='/DDN_ROOT/wjpeng/dataset/clip_benchmark_datasets' \
---val-vl-data-root='/DDN_ROOT/wjpeng/dataset/VL-benchmark/clean_val_v3/data'
+--val-vl-data-root='/DDN_ROOT/wjpeng/dataset/VL-benchmark/clean_val_v3/data' \
+--wandb \
+--wandb-project-name='test'
 
 
---distributed \
 
 
 

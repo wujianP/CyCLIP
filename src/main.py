@@ -197,20 +197,20 @@ if __name__ == "__main__":
     listener.start()
 
     ngpus = torch.cuda.device_count()
-    if (ngpus == 0 or options.device == "cpu"):
+    if ngpus == 0 or options.device == "cpu":
         options.device = "cpu"
         options.num_devices = 1
         options.distributed = False
         worker(0, options, logger)
     else:
-        if (ngpus == 1 or not options.distributed):
+        if ngpus == 1 or not options.distributed:
             options.device = "cuda"
             options.num_devices = 1
             options.distributed = False
             worker(0, options, logger)
         else:
             options.device = "cuda"
-            if (options.device_ids is None):
+            if options.device_ids is None:
                 options.device_ids = list(range(ngpus))
                 options.num_devices = ngpus
             else:

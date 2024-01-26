@@ -102,16 +102,10 @@ def train(epoch, model, data, optimizer, scheduler, scaler, options):
     model.train()
     criterion = nn.CrossEntropyLoss().to(options.device)
 
-    # modulo = max(1, int(dataloader.num_samples / options.batch_size / 10))
-    modulo = max(1, int(options.steps_per_epoch / 10))
     umodel = model.module if options.distributed else model
 
-    start = time.time()
-
-    # logging.info(f"Num samples: {dataloader.num_samples}, Num_batches: {dataloader.num_batches}")
-    # for index, batch in enumerate(dataloader):
     for index in range(options.steps_per_epoch):
-
+        start = time.time()
         step = options.steps_per_epoch * epoch + index
         scheduler(step)
 
@@ -207,6 +201,7 @@ def train(epoch, model, data, optimizer, scheduler, scaler, options):
             all_pixel_values)
 
         # <<< get data and reshape, concatenate them <<<
+        data_time = time.time() - start
 
         optimizer.zero_grad()
 
@@ -235,16 +230,36 @@ def train(epoch, model, data, optimizer, scheduler, scaler, options):
         scaler.update()
         umodel.logit_scale.data = torch.clamp(umodel.logit_scale.data, 0, 4.6052)
 
-        end = time.time()
+        batch_time = time.time() - start
+        process_time = batch_time - data_time
 
-        if options.master and (((index + 1) % options.log_per_steps == 0) or (index == options.steps_per_epoch - 1)):
-
+        if options.master and (((index + 1) % options.log_per_steps == 0) or (index + 1 == options.steps_per_epoch)):
             logging.info(
                 f"Train Epoch: {epoch + 1:02d} [{step}/{options.steps_per_epoch * options.epochs} ({100.0 * (index + 1) / options.steps_per_epoch:.0f}%)]"
                 f"\tLoss: {loss.item():.6f}"
                 f"\tcomLoss: {common_loss.item():.6f}"
                 f"\textLoss: {extra_loss.item():.6f}"
-                f"\tTime taken {end - start:.2f}"
+                f"\tBatch Time {batch_time:.2f}"
+                f"\tData Time {data_time:.2f}"
+                f"\tProcess Time {process_time:.2f}"
+                f"\tScale {umodel.logit_scale.data:.4f}"
                 f"\tLearning Rate: {optimizer.param_groups[0]['lr']:.10f}")
 
-            start = time.time()
+            # Save train loss / etc. Using non avg meter values as loggers have their own smoothing
+            log_data = {
+                "data_time": data_time,
+                "batch_time": batch_time,
+                "process_time": process_time,
+                "scale": umodel.logit_scale.data,
+                "common_loss": common_loss.item(),
+                "extra_loss": extra_loss.item(),
+                "total_loss": loss.item(),
+                "lr": optimizer.param_groups[0]["lr"]
+            }
+
+            log_data = {"train/" + name: val for name, val in log_data.items()}
+
+            if options.wandb:
+                log_data['step'] = step  # for backwards compatibility
+                # wandb.log(log_data, step=step)
+                wandb.log(log_data)
