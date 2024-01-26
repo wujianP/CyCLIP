@@ -16,7 +16,7 @@ from .clip_models import CLIPWrapper
 @torch.no_grad()
 def vl_eval(args, model, processor, device="cuda"):
     # load data
-    data = get_data(data_root=args.val_vl_data_root, processor=processor)
+    data = get_data(data_root=args.val_vl_data_root, processor=processor, mini_dataset=args.min_dataset)
 
     # wrap model
     clip_model = CLIPWrapper(model, device, None)

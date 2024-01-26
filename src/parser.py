@@ -65,5 +65,6 @@ def parse_args():
     parser.add_argument("--val-common-data-root", type=str)
     parser.add_argument("--val-vl-data-root", type=str)
     parser.add_argument("--wandb-key", type=str)
+    parser.add_argument("--mini-dataset", action='store_true')
     options = parser.parse_args()
     return options

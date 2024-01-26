@@ -27,7 +27,7 @@ class BaseDataset(Dataset):
 
 
 class Image2TextDataset(BaseDataset):
-    def __init__(self, data_root, processor, mini_dataset=False):
+    def __init__(self, data_root, processor, mini_dataset):
         ann = os.path.join(data_root, 'image2text_anns.json')
         super().__init__(data_root, ann, processor, mini_dataset)
 
@@ -59,7 +59,7 @@ class Image2TextDataset(BaseDataset):
 
 
 class Text2ImageDataset(BaseDataset):
-    def __init__(self, data_root, processor, mini_dataset=False):
+    def __init__(self, data_root, processor, mini_dataset):
         ann = os.path.join(data_root, 'text2image_anns.json')
         super().__init__(data_root, ann, processor, mini_dataset)
 
