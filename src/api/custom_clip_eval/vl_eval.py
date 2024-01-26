@@ -18,9 +18,6 @@ def vl_eval(args, model, processor, device="cuda"):
     # load data
     data = get_data(data_root=args.val_vl_data_root, processor=processor)
 
-    from IPython import embed
-    embed(header='in vl-eval')
-
     # wrap model
     clip_model = CLIPWrapper(model, device, None)
 
