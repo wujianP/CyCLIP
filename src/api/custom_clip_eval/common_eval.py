@@ -13,7 +13,7 @@ def common_eval(model_name,
                 out_root=None,
                 batch_size=64,):
 
-    dataset = ['flickr30k', 'mscoco_captions', 'cifar10', 'cifar100', 'imagenet1k', 'pets', 'stl10', 'flowers', 'caltech101']
+    dataset = ['caltech101', 'flickr30k', 'mscoco_captions', 'cifar10', 'cifar100', 'imagenet1k', 'pets', 'stl10', 'flowers']
 
     if out_root is None:
         home_dir = os.path.expanduser("~")
@@ -21,8 +21,7 @@ def common_eval(model_name,
 
     os.makedirs(out_root, exist_ok=True)
 
-    if isinstance(dataset, list):
-        dataset = " ".join(dataset)
+    dataset = " ".join(dataset)
 
     # evaluate using CLI
     cmd = f'clip_benchmark eval \

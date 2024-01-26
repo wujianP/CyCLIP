@@ -216,21 +216,6 @@ def evaluate(epoch, model, processor, options):
         model = model.module
     model.eval()
 
-    # >>> STEP 1: evaluate on VL Benchmark (ours)
-    vl_result = vl_eval(args=options, model=model, processor=processor)
-
-    vl_log_info = "SPEC Benchmark:\n" + "\n".join(
-        [f"{acc_name.capitalize()} i2T-acc: {acc['i2t_acc']:#.2f}  t2I-acc: {acc['t2i_acc']:#.2f}"
-         for acc_name, acc in vl_result.items()])
-    logging.info(vl_log_info)
-
-    vl_log_data = {}
-    for (bench_nm, bench_acc) in vl_result.items():
-        vl_log_data[f'vl_eval/{bench_nm}-i2t'] = bench_acc['i2t_acc']
-        vl_log_data[f'vl_eval/{bench_nm}-t2i'] = bench_acc['t2i_acc']
-    if options.wandb:
-        wandb.log(vl_log_data)
-
     # >>> STEP 2: evaluate on Common Benchmark (zero-shot)
     # > convert model into checkpoint.pth
     checkpoint_dict = {
@@ -263,5 +248,21 @@ def evaluate(epoch, model, processor, options):
             common_log_data[f'common_eval/{bench_nm}-{metric_nm}'] = metric_value
     if options.wandb:
         wandb.log(common_log_data)
+
+
+    # >>> STEP 1: evaluate on VL Benchmark (ours)
+    vl_result = vl_eval(args=options, model=model, processor=processor)
+
+    vl_log_info = "SPEC Benchmark:\n" + "\n".join(
+        [f"{acc_name.capitalize()} i2T-acc: {acc['i2t_acc']:#.2f}  t2I-acc: {acc['t2i_acc']:#.2f}"
+         for acc_name, acc in vl_result.items()])
+    logging.info(vl_log_info)
+
+    vl_log_data = {}
+    for (bench_nm, bench_acc) in vl_result.items():
+        vl_log_data[f'vl_eval/{bench_nm}-i2t'] = bench_acc['i2t_acc']
+        vl_log_data[f'vl_eval/{bench_nm}-t2i'] = bench_acc['t2i_acc']
+    if options.wandb:
+        wandb.log(vl_log_data)
 
     model.train()
