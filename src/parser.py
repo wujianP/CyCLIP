@@ -64,5 +64,6 @@ def parse_args():
     parser.add_argument("--val-workers", type=int, default=8)
     parser.add_argument("--val-common-data-root", type=str)
     parser.add_argument("--val-vl-data-root", type=str)
+    parser.add_argument("--wandb-key", type=str)
     options = parser.parse_args()
     return options

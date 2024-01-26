@@ -125,15 +125,19 @@ def worker(rank, options, logger):
     cudnn.deterministic = False
 
     if options.wandb and options.master:
-        logging.debug("Starting wandb")
-        wandb.init(project=options.wandb_project_name,
-                   name=options.name,
-                   id=options.name,
-                   notes=options.notes,
-                   tags=[],
-                   config=vars(options))
-        wandb.run.name = options.name
-        wandb.save(os.path.join(options.log_dir_path, "params.txt"))
+        wandb_login_success = wandb.login(key=options.wandb_key, timeout=30)
+        if not wandb_login_success:
+            logging.debug("Wandb init Failed!!!")
+        else:
+            logging.debug("Starting wandb")
+            wandb.init(project=options.wandb_project_name,
+                       name=options.name,
+                       id=options.name,
+                       notes=options.notes,
+                       tags=[],
+                       config=vars(options))
+            wandb.run.name = options.name
+            wandb.save(os.path.join(options.log_dir_path, "params.txt"))
 
     # evaluate(start_epoch, model, processor, data, options)
 
