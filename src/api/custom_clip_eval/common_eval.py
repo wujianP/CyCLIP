@@ -12,9 +12,8 @@ def common_eval(model_name,
                 distributed=False,
                 out_root=None,
                 batch_size=64,):
-    from IPython import embed
-    embed(header='inner')
-    dataset = ['flickr30k', 'mscoco_captions', 'cifar10', 'cifar100', 'imagenet1k', 'mnist', 'stl10', 'flowers', 'caltech101']
+
+    dataset = ['flickr30k', 'mscoco_captions', 'cifar10', 'cifar100', 'imagenet1k', 'pets', 'stl10', 'flowers', 'caltech101']
 
     if out_root is None:
         home_dir = os.path.expanduser("~")

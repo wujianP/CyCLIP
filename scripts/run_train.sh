@@ -29,8 +29,8 @@ python -m src.main \
 --extra-ann-root='/DDN_ROOT/wjpeng/dataset/VL-benchmark/train/captions_expanded/' \
 --save_per_epoch=1 \
 --save_most_recent \
---val_batch_size=64 \
---val_workers=8 \
+--val-batch-size=64 \
+--val-workers=8 \
 --val-common-data-root='/DDN_ROOT/wjpeng/dataset/clip_benchmark_datasets'
 
 
