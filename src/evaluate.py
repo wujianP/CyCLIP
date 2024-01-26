@@ -1,11 +1,14 @@
 import wandb
 import torch
 import logging
+import os
 import numpy as np
 import torch.nn as nn
 import torch.optim as optim
 from tqdm import tqdm    
 from .scheduler import cosine_scheduler
+from custom_clip_eval import vl_eval, common_eval
+
 
 def get_validation_metrics(model, dataloader, options):
     logging.info("Started validating")
@@ -38,6 +41,7 @@ def get_validation_metrics(model, dataloader, options):
     logging.info("Finished validating")
 
     return metrics
+
 
 def get_zeroshot_metrics(model, processor, test_dataloader, options):
     logging.info("Started zeroshot testing")
@@ -80,6 +84,7 @@ def get_zeroshot_metrics(model, processor, test_dataloader, options):
 
     return results
 
+
 class LogisticRegression(torch.nn.Module):
     def __init__(self, input_dim, output_dim):
         super(LogisticRegression, self).__init__()
@@ -88,7 +93,8 @@ class LogisticRegression(torch.nn.Module):
     def forward(self, x):
         outputs = self.linear(x)
         return outputs
-    
+
+
 def get_linear_probe_metrics(model, train_dataloader, test_dataloader, options):
     logging.info("Started linear probe testing")
     logging.info(f"Number of train examples: {train_dataloader.num_samples}")
@@ -204,32 +210,59 @@ def get_linear_probe_metrics(model, train_dataloader, test_dataloader, options):
     logging.info("Finished linear probe testing")
     return results
 
-def evaluate(epoch, model, processor, data, options):
-    metrics = {}
-    
-    if(options.master):
-        if(data["validation"] is not None or data["eval_test"] is not None):
-            if(epoch == 0):
-                logging.info(f"Base evaluation")
-            else:
-                logging.info(f"Epoch {epoch} evaluation")
 
-        if(data["validation"] is not None): 
-            metrics.update(get_validation_metrics(model, data["validation"], options))
-            
-        if(data["eval_test"] is not None): 
-            if(data["eval_train"] is not None):
-                metrics.update(get_linear_probe_metrics(model, data["eval_train"], data["eval_test"], options))
-            else:
-                metrics.update(get_zeroshot_metrics(model, processor, data["eval_test"], options))
-        
-        if(metrics):
-            logging.info("Results")
-            for key, value in metrics.items():
-                logging.info(f"{key}: {value:.4f}")
+def evaluate(epoch, model, processor, options):
+    if options.distributed:
+        model = model.module
+    model.eval()
 
-            if(options.wandb):
-                for key, value in metrics.items():
-                    wandb.log({f"evaluation/{key}": value, "epoch": epoch})
+    # >>> STEP 1: evaluate on Common Benchmark (zero-shot)
+    # > convert model into checkpoint.pth
+    checkpoint_dict = {
+        "name": options.model_name,
+        "state_dict": model.state_dict()
+    }
+    home_dir = os.path.expanduser("~")
+    temp_dir = os.path.join(home_dir, '.cache', 'cyclip')
+    os.makedirs(temp_dir, exist_ok=True)
+    checkpoint_path = os.path.join(temp_dir, f"checkpoint.pt")
+    torch.save(checkpoint_dict, checkpoint_path)
 
-    return metrics
+    common_result = common_eval(model_name=options.model_name,
+                                pretrained=checkpoint_path,
+                                data_root=options.val_common_data_root,
+                                batch_size=options.val_batch_size)
+
+    # > remove the temp checkpoint
+    os.remove(checkpoint_path)
+
+    common_log_info = "Zero-shot Benchmark:\n" + "\n".join(
+        [f"{bench_nm.capitalize()} {' '.join(metric for metric in metrics)}"
+         for bench_nm, metrics in common_result.items()])
+    logging.info(common_log_info)
+
+    common_log_data = {}
+    for (bench_nm, metrics) in common_result.items():
+        for m in metrics:
+            metric_nm = m.split(': ')[0]
+            metric_value = eval(m.split(': ')[1])
+            common_log_data[f'common_eval/{bench_nm}-{metric_nm}'] = metric_value
+    if options.wandb:
+        wandb.log(common_log_data)
+
+    # >>> STEP 2: evaluate on VL Benchmark (ours)
+    vl_result = vl_eval(args=options, model=model, preprocess=preprocess, tokenizer=tokenizer)
+
+    vl_log_info = "SPEC Benchmark:\n" + "\n".join(
+        [f"{acc_name.capitalize()} i2T-acc: {acc['i2t_acc']:#.2f}  t2I-acc: {acc['t2i_acc']:#.2f}"
+         for acc_name, acc in vl_result.items()])
+    logging.info(vl_log_info)
+
+    vl_log_data = {}
+    for (bench_nm, bench_acc) in vl_result.items():
+        vl_log_data[f'vl_eval/{bench_nm}-i2t'] = bench_acc['i2t_acc']
+        vl_log_data[f'vl_eval/{bench_nm}-t2i'] = bench_acc['t2i_acc']
+    if options.wandb:
+        wandb.log(vl_log_data)
+
+    model.train()

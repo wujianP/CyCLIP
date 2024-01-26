@@ -4,7 +4,7 @@ conda activate /discobox/wjpeng/env/cyCLIP
 #rm -rf /discobox/wjpeng/ckp/betterCLIP/debug
 python -m src.main \
 --logs='/discobox/wjpeng/ckp/betterCLIP/debug' \
---name='exp3' \
+--name='exp5' \
 --train_data='/discobox/wjpeng/dataset/cc3m/data/val/train_filtered.csv' \
 --validation_data='/discobox/wjpeng/dataset/cc3m/data/val/train_filtered.csv' \
 --from-pretrained='/DDN_ROOT/wjpeng/weights/cyclip/cyclip.pt' \
@@ -21,13 +21,18 @@ python -m src.main \
 --cylambda2 0.25 \
 --log-per-steps=10 \
 --epochs=10 \
---steps-per-epoch=1000000 \
+--steps-per-epoch=100 \
 --extra-train-data='/DDN_ROOT/wjpeng/dataset/VL-benchmark/train/' \
 --extra-batch-size=8 \
 --extra-loss-wt=0.2 \
 --extra-data-type count existence relative-size absolute-size absolute-spatial relative-spatial \
 --extra-ann-root='/DDN_ROOT/wjpeng/dataset/VL-benchmark/train/captions_expanded/' \
 --save_per_epoch=1 \
---save_most_recent
+--save_most_recent \
+--val_batch_size=64 \
+--val_workers=8 \
+--val-common-data-root='/DDN_ROOT/wjpeng/dataset/clip_benchmark_datasets'
+
+
 
 

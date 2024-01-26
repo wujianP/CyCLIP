@@ -60,5 +60,8 @@ def parse_args():
     parser.add_argument("--save_per_epoch", type=int, default=1)
     parser.add_argument("--save_most_recent", action='store_true')
     parser.add_argument("--do-not-eval-epoch-0", action='store_true')
+    parser.add_argument("--val-batch-size", type=int, default=64)
+    parser.add_argument("--val-workers", type=int, default=8)
+    parser.add_argument("--val-common-data-root", type=str)
     options = parser.parse_args()
     return options

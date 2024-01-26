@@ -139,20 +139,27 @@ def worker(rank, options, logger):
 
         scaler = GradScaler()
 
-        best_loss = np.inf
         for epoch in range(start_epoch, options.epochs):
-            # training one epoch
+            # >>> eval before training begin >>>
+            if epoch == 0 and options.master and (not options.do_not_eval_epoch_0):
+                logging.info(f'Start Evaluation before the : The Baseline Without Training')
+                evaluate(epoch=epoch, model=model, processor=processor, options=options)
+
+            # >>> training one epoch >>>
             if options.master:
-                logging.info(f"Starting Epoch {epoch}")
+                logging.info(f"Starting Training Epoch {epoch + 1} / {options.epochs}")
             start = time.time()
             train(epoch, model, data, optimizer, scheduler, scaler, options)
             end = time.time()
             if options.master:
-                logging.info(f"Finished Epoch {epoch + 1}, Time Taken Per Epoch: {seconds_to_hms(end - start)}")
+                logging.info(f"Finished Training Epoch {epoch + 1} / {options.epochs}, Time Taken Per Epoch: {seconds_to_hms(end - start)}")
 
-            # metrics = evaluate(epoch, model, processor, data, options)
+            # >>> eval one epoch >>>
+            if options.master:
+                logging.info(f'Start Evaluating Epoch {epoch + 1} /  {options.epochs}')
+                evaluate(epoch=epoch, model=model, processor=processor, options=options)
 
-            # save checkpoints
+            # >>> save checkpoints >>>
             if options.master:
                 checkpoint = {"epoch": epoch + 1,
                               "name": options.name,

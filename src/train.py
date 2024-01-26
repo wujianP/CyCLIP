@@ -240,11 +240,11 @@ def train(epoch, model, data, optimizer, scheduler, scaler, options):
         if options.master and (((index + 1) % options.log_per_steps == 0) or (index == options.steps_per_epoch - 1)):
 
             logging.info(
-                f"Train Epoch: {epoch:02d} [{step}/{options.steps_per_epoch * options.epochs} ({100.0 * (index + 1) / options.steps_per_epoch:.0f}%)]"
+                f"Train Epoch: {epoch + 1:02d} [{step}/{options.steps_per_epoch * options.epochs} ({100.0 * (index + 1) / options.steps_per_epoch:.0f}%)]"
                 f"\tLoss: {loss.item():.6f}"
                 f"\tcomLoss: {common_loss.item():.6f}"
                 f"\textLoss: {extra_loss.item():.6f}"
-                f"\tTime taken {end - start:.3f}"
+                f"\tTime taken {end - start:.2f}"
                 f"\tLearning Rate: {optimizer.param_groups[0]['lr']:.10f}")
 
             start = time.time()
