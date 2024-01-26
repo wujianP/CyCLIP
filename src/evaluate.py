@@ -228,6 +228,8 @@ def evaluate(epoch, model, processor, options):
     checkpoint_path = os.path.join(temp_dir, f"checkpoint.pt")
     torch.save(checkpoint_dict, checkpoint_path)
 
+    from IPython import embed
+    embed(header='out')
     common_result = common_eval(model_name=options.model_name,
                                 pretrained=checkpoint_path,
                                 data_root=options.val_common_data_root,
