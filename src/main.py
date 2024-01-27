@@ -157,6 +157,7 @@ def worker(rank, options, logger):
                 if options.master:
                     logging.info(f'Start Evaluation before the : The Baseline Without Training')
                 evaluate(epoch=epoch, model=model, processor=processor, options=options)
+                torch.cuda.empty_cache()
 
             # >>> training one epoch >>>
             if options.master:
@@ -173,6 +174,7 @@ def worker(rank, options, logger):
                 if options.master:
                     logging.info(f'Start Evaluating Epoch {epoch + 1} /  {options.epochs}')
                 evaluate(epoch=epoch, model=model, processor=processor, options=options)
+                torch.cuda.empty_cache()
 
             # >>> save checkpoints >>>
             if options.master:
