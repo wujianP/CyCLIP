@@ -169,9 +169,10 @@ def worker(rank, options, logger):
                 logging.info(f"Finished Training Epoch {epoch + 1} / {options.epochs}, Time Taken Per Epoch: {seconds_to_hms(end - start)}")
 
             # >>> eval one epoch >>>
-            if options.master:
-                logging.info(f'Start Evaluating Epoch {epoch + 1} /  {options.epochs}')
-            evaluate(epoch=epoch, model=model, processor=processor, options=options)
+            if (epoch + 1) % options.eval_per_epoch == 0 or (epoch + 1) == options.epochs:
+                if options.master:
+                    logging.info(f'Start Evaluating Epoch {epoch + 1} /  {options.epochs}')
+                evaluate(epoch=epoch, model=model, processor=processor, options=options)
 
             # >>> save checkpoints >>>
             if options.master:

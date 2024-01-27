@@ -66,5 +66,6 @@ def parse_args():
     parser.add_argument("--val-vl-data-root", type=str)
     parser.add_argument("--wandb-key", type=str)
     parser.add_argument("--mini-dataset", action='store_true')
+    parser.add_argument("--eval-per-epoch", type=int, default=1)
     options = parser.parse_args()
     return options
